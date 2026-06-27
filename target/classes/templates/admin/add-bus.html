@@ -1,0 +1,209 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Add New Bus</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.0/font/bootstrap-icons.css">
+    <style>
+        .form-container {
+            max-width: 800px;
+            margin: 30px auto;
+            padding: 30px;
+            border-radius: 10px;
+            box-shadow: 0 0 20px rgba(0,0,0,0.1);
+            background-color: #fff;
+        }
+        .form-header {
+            text-align: center;
+            margin-bottom: 30px;
+            color: #343a40;
+            border-bottom: 2px solid #343a40;
+            padding-bottom: 10px;
+        }
+        .form-label {
+            font-weight: 500;
+        }
+        .btn-custom {
+            min-width: 120px;
+        }
+        .error-message {
+            font-size: 0.875rem;
+            color: #dc3545;
+        }
+        .location-icon {
+            color: #6c757d;
+        }
+    </style>
+</head>
+<body>
+<nav class="navbar navbar-expand-lg navbar-dark bg-dark">
+    <div class="container">
+        <a class="navbar-brand" href="/admin/dashboard">
+            <i class="bi bi-bus-front"></i> BusTicketBooking Admin
+        </a>
+        <div class="d-flex">
+            <a href="/admin/dashboard" class="btn btn-outline-light btn-sm me-2">
+                <i class="bi bi-arrow-left"></i> Back
+            </a>
+            <a href="/logout" class="btn btn-outline-light btn-sm">
+                <i class="bi bi-box-arrow-right"></i> Logout
+            </a>
+        </div>
+    </div>
+</nav>
+
+<div class="container">
+    <div class="form-container">
+        <h2 class="form-header"><i class="bi bi-plus-circle me-2"></i>Add New Bus</h2>
+
+        <!-- Success/Error Messages -->
+        <div th:if="${successMessage}" class="alert alert-success alert-dismissible fade show">
+            <span th:text="${successMessage}"></span>
+            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+        </div>
+        <div th:if="${errorMessage}" class="alert alert-danger alert-dismissible fade show">
+            <span th:text="${errorMessage}"></span>
+            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+        </div>
+
+        <form th:action="@{/admin/add-bus}" th:object="${bus}" method="post" id="busForm">
+            <div class="row mb-3">
+                <div class="col-md-6">
+                    <label for="busNo" class="form-label">Bus Number <span class="text-danger">*</span></label>
+                    <input type="text" class="form-control" id="busNo" th:field="*{busNo}" required>
+                    <div class="error-message" th:if="${#fields.hasErrors('busNo')}" th:errors="*{busNo}"></div>
+                </div>
+                <div class="col-md-6">
+                    <label for="price" class="form-label">Price (₹) <span class="text-danger">*</span></label>
+                    <div class="input-group">
+                        <span class="input-group-text">₹</span>
+                        <input type="number" class="form-control" id="price" th:field="*{price}" min="0" step="0.01" required>
+                    </div>
+                    <div class="error-message" th:if="${#fields.hasErrors('price')}" th:errors="*{price}"></div>
+                </div>
+            </div>
+
+            <div class="row mb-3">
+                <div class="col-md-6">
+                    <label for="fromLocation" class="form-label">From <span class="text-danger">*</span></label>
+                    <div class="input-group">
+                        <span class="input-group-text location-icon"><i class="bi bi-geo-alt"></i></span>
+                        <input type="text" class="form-control" id="fromLocation" th:field="*{fromLocation}" required>
+                    </div>
+                    <div class="error-message" th:if="${#fields.hasErrors('fromLocation')}" th:errors="*{fromLocation}"></div>
+                </div>
+                <div class="col-md-6">
+                    <label for="toLocation" class="form-label">To <span class="text-danger">*</span></label>
+                    <div class="input-group">
+                        <span class="input-group-text location-icon"><i class="bi bi-geo-alt-fill"></i></span>
+                        <input type="text" class="form-control" id="toLocation" th:field="*{toLocation}" required>
+                    </div>
+                    <div class="error-message" th:if="${#fields.hasErrors('toLocation')}" th:errors="*{toLocation}"></div>
+                </div>
+            </div>
+
+            <div class="row mb-3">
+                <div class="col-md-6">
+                    <label for="departureTime" class="form-label">Departure Time <span class="text-danger">*</span></label>
+                    <input type="datetime-local" class="form-control" id="departureTime" th:field="*{departureTime}" required>
+                    <div class="error-message" th:if="${#fields.hasErrors('departureTime')}" th:errors="*{departureTime}"></div>
+                </div>
+                <div class="col-md-6">
+                    <label for="arrivalTime" class="form-label">Arrival Time <span class="text-danger">*</span></label>
+                    <input type="datetime-local" class="form-control" id="arrivalTime" th:field="*{arrivalTime}" required>
+                    <div class="error-message" th:if="${#fields.hasErrors('arrivalTime')}" th:errors="*{arrivalTime}"></div>
+                </div>
+            </div>
+
+            <div class="row mb-4">
+                <div class="col-md-6">
+                    <label for="totalSeats" class="form-label">Total Seats <span class="text-danger">*</span></label>
+                    <input type="number" class="form-control" id="totalSeats" th:field="*{totalSeats}" min="1" required>
+                    <div class="error-message" th:if="${#fields.hasErrors('totalSeats')}" th:errors="*{totalSeats}"></div>
+                </div>
+                <div class="col-md-6">
+                    <label for="availableSeats" class="form-label">Available Seats <span class="text-danger">*</span></label>
+                    <input type="number" class="form-control" id="availableSeats" th:field="*{availableSeats}" min="0" required>
+                    <div class="error-message" th:if="${#fields.hasErrors('availableSeats')}" th:errors="*{availableSeats}"></div>
+                </div>
+            </div>
+
+            <div class="d-flex justify-content-between">
+                <button type="reset" class="btn btn-outline-secondary btn-custom">
+                    <i class="bi bi-arrow-counterclockwise"></i> Reset
+                </button>
+                <button type="submit" class="btn btn-primary btn-custom">
+                    <i class="bi bi-save"></i> Save Bus
+                </button>
+            </div>
+        </form>
+    </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+<script>
+    // Link total seats and available seats
+    document.getElementById('totalSeats').addEventListener('change', function() {
+        const availableSeats = document.getElementById('availableSeats');
+        availableSeats.max = this.value;
+        if (parseInt(availableSeats.value) > parseInt(this.value)) {
+            availableSeats.value = this.value;
+        }
+    });
+
+    // Set minimum arrival time based on departure time
+    document.getElementById('departureTime').addEventListener('change', function() {
+        const arrivalInput = document.getElementById('arrivalTime');
+        arrivalInput.min = this.value;
+
+        // If current arrival is before new departure, reset it
+        if (arrivalInput.value && arrivalInput.value < this.value) {
+            const departureTime = new Date(this.value);
+            departureTime.setHours(departureTime.getHours() + 1);
+            arrivalInput.value = departureTime.toISOString().slice(0, 16);
+        }
+    });
+
+    // Set default values on page load
+    document.addEventListener('DOMContentLoaded', function() {
+        // Set default departure time to now + 1 hour
+        const now = new Date();
+        now.setHours(now.getHours() + 1);
+        now.setMinutes(0);
+        now.setSeconds(0);
+
+        const departureInput = document.getElementById('departureTime');
+        departureInput.value = now.toISOString().slice(0, 16);
+
+        // Set default arrival to departure + 6 hours
+        const arrivalTime = new Date(now);
+        arrivalTime.setHours(arrivalTime.getHours() + 6);
+        document.getElementById('arrivalTime').value = arrivalTime.toISOString().slice(0, 16);
+
+        // Set available seats equal to total seats by default
+        document.getElementById('totalSeats').value = 40;
+        document.getElementById('availableSeats').value = 40;
+        document.getElementById('availableSeats').max = 40;
+
+        // Set default price
+        document.getElementById('price').value = 1200.00;
+    });
+
+    // Form validation before submission
+    document.getElementById('busForm').addEventListener('submit', function(e) {
+        const departureTime = new Date(document.getElementById('departureTime').value);
+        const arrivalTime = new Date(document.getElementById('arrivalTime').value);
+
+        if (departureTime >= arrivalTime) {
+            alert('Arrival time must be after departure time');
+            e.preventDefault();
+            return false;
+        }
+
+        return true;
+    });
+</script>
+</body>
+</html>

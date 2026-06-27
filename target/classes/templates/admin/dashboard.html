@@ -1,0 +1,236 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin Dashboard</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.0/font/bootstrap-icons.css">
+    <style>
+        .dashboard-header {
+            background-color: #343a40;
+            color: white;
+            padding: 15px 0;
+            margin-bottom: 30px;
+        }
+        .current-time {
+            font-size: 1.2rem;
+            font-weight: bold;
+        }
+        .bus-table th {
+            background-color: #343a40;
+            color: white;
+            position: sticky;
+            top: 0;
+        }
+        .action-buttons .btn {
+            padding: 0.25rem 0.5rem;
+            font-size: 0.875rem;
+            margin: 2px;
+        }
+        .status-badge {
+            font-size: 0.75rem;
+        }
+        .search-box {
+            background-color: #f8f9fa;
+            padding: 20px;
+            border-radius: 5px;
+            margin-bottom: 20px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        .seat-availability {
+            width: 100px;
+        }
+        .progress {
+            height: 5px;
+        }
+        .table-container {
+            max-height: 70vh;
+            overflow-y: auto;
+        }
+        .no-buses {
+            text-align: center;
+            padding: 50px;
+            color: #6c757d;
+        }
+    </style>
+</head>
+<body>
+<nav class="navbar navbar-expand-lg navbar-dark bg-dark">
+    <div class="container">
+        <a class="navbar-brand" href="/admin/dashboard">
+            <i class="bi bi-bus-front"></i> BusTicketBooking Admin
+        </a>
+        <div class="d-flex align-items-center">
+                <span class="navbar-text me-3 current-time"
+                      th:text="${#temporals.format(currentDateTime, 'dd MMM yyyy, hh:mm a')}"></span>
+            <a href="/logout" class="btn btn-outline-light btn-sm">
+                <i class="bi bi-box-arrow-right"></i> Logout
+            </a>
+        </div>
+    </div>
+</nav>
+
+<div class="container">
+    <!-- Success/Error Messages -->
+    <div th:if="${successMessage}" class="alert alert-success alert-dismissible fade show mt-3">
+        <span th:text="${successMessage}"></span>
+        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+    </div>
+    <div th:if="${errorMessage}" class="alert alert-danger alert-dismissible fade show mt-3">
+        <span th:text="${errorMessage}"></span>
+        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+    </div>
+
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h2><i class="bi bi-bus-front me-2"></i>Bus Management</h2>
+        <a href="/admin/add-bus" class="btn btn-primary">
+            <i class="bi bi-plus-circle"></i> Add New Bus
+        </a>
+    </div>
+
+    <!-- Search Box -->
+    <div class="search-box">
+        <form th:action="@{/admin/dashboard}" method="get">
+            <div class="row g-3">
+                <div class="col-md-4">
+                    <div class="input-group">
+                        <span class="input-group-text"><i class="bi bi-bus-front"></i></span>
+                        <input type="text" class="form-control" name="busNo"
+                               placeholder="Bus Number" th:value="${param.busNo}">
+                    </div>
+                </div>
+                <div class="col-md-4">
+                    <div class="input-group">
+                        <span class="input-group-text"><i class="bi bi-geo-alt"></i></span>
+                        <input type="text" class="form-control" name="route"
+                               placeholder="From or To location" th:value="${param.route}">
+                    </div>
+                </div>
+                <div class="col-md-2">
+                    <button type="submit" class="btn btn-primary w-100">
+                        <i class="bi bi-search"></i> Search
+                    </button>
+                </div>
+                <div class="col-md-2">
+                    <a href="/admin/dashboard" class="btn btn-outline-secondary w-100">
+                        <i class="bi bi-arrow-counterclockwise"></i> Reset
+                    </a>
+                </div>
+            </div>
+        </form>
+    </div>
+
+    <!-- Search Results Info -->
+    <div th:if="${param.busNo != null or param.route != null}" class="alert alert-info mb-3">
+            <span th:if="${param.busNo != null}">
+                Showing results for bus number: <strong th:text="${param.busNo}"></strong>
+            </span>
+        <span th:if="${param.busNo != null and param.route != null}"> and </span>
+        <span th:if="${param.route != null}">
+                route containing: <strong th:text="${param.route}"></strong>
+            </span>
+        <span th:if="${buses.empty}"> - No buses found</span>
+    </div>
+
+    <!-- Bus Table -->
+    <div class="table-container">
+        <table class="table table-striped table-hover bus-table">
+            <thead>
+            <tr>
+                <th>Bus No</th>
+                <th>Route</th>
+                <th>Schedule</th>
+                <th>Seats</th>
+                <th>Price</th>
+                <th>Status</th>
+                <th>Actions</th>
+            </tr>
+            </thead>
+            <tbody>
+            <tr th:each="bus : ${buses}">
+                <td th:text="${bus.busNo}"></td>
+                <td>
+                    <strong th:text="${bus.fromLocation}"></strong>
+                    <i class="bi bi-arrow-right"></i>
+                    <strong th:text="${bus.toLocation}"></strong>
+                </td>
+                <td>
+                    <div><i class="bi bi-arrow-up-right"></i> <span th:text="${#temporals.format(bus.departureTime, 'dd-MMM HH:mm')}"></span></div>
+                    <div><i class="bi bi-arrow-down-right"></i> <span th:text="${#temporals.format(bus.arrivalTime, 'dd-MMM HH:mm')}"></span></div>
+                </td>
+                <td class="seat-availability">
+                    <div th:text="${bus.availableSeats} + '/' + ${bus.totalSeats}"></div>
+                    <div class="progress mt-1">
+                        <div class="progress-bar"
+                             th:classappend="${bus.availableSeats == 0} ? 'bg-danger' : 'bg-success'"
+                             th:style="'width:' + ${(bus.totalSeats - bus.availableSeats) * 100 / bus.totalSeats} + '%'">
+                        </div>
+                    </div>
+                </td>
+                <td th:text="${'₹' + #numbers.formatDecimal(bus.price, 1, 2)}"></td>
+                <td>
+                            <span th:if="${bus.departureTime.isAfter(currentDateTime)}"
+                                  class="badge bg-success status-badge">Upcoming</span>
+                    <span th:unless="${bus.departureTime.isAfter(currentDateTime)}"
+                          class="badge bg-secondary status-badge">Departed</span>
+                </td>
+                <td class="action-buttons">
+                    <a th:href="@{/admin/edit-bus/{id}(id=${bus.id})}"
+                       class="btn btn-sm btn-warning"
+                       title="Edit">
+                        <i class="bi bi-pencil"></i>
+                    </a>
+                    <a th:href="@{/admin/delete-bus/{id}(id=${bus.id})}"
+                       class="btn btn-sm btn-danger"
+                       title="Delete"
+                       onclick="return confirm('Are you sure you want to delete bus ${bus.busNo}?')">
+                        <i class="bi bi-trash"></i>
+                    </a>
+                </td>
+            </tr>
+            <tr th:if="${buses.empty}">
+                <td colspan="7" class="no-buses">
+                    <i class="bi bi-exclamation-circle" style="font-size: 2rem;"></i>
+                    <h4 class="mt-3">No buses found</h4>
+                    <p class="text-muted">Try adjusting your search criteria or add a new bus</p>
+                    <a href="/admin/add-bus" class="btn btn-primary mt-2">
+                        <i class="bi bi-plus-circle"></i> Add New Bus
+                    </a>
+                </td>
+            </tr>
+            </tbody>
+        </table>
+    </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+<script>
+    // Update current time every minute
+    function updateCurrentTime() {
+        const now = new Date();
+        const options = {
+            day: '2-digit',
+            month: 'short',
+            year: 'numeric',
+            hour: '2-digit',
+            minute: '2-digit',
+            hour12: true
+        };
+        document.querySelector('.current-time').textContent = now.toLocaleDateString('en-US', options);
+    }
+    setInterval(updateCurrentTime, 60000);
+    updateCurrentTime();
+
+    // Auto-focus search input if parameter exists
+    document.addEventListener('DOMContentLoaded', function() {
+        const urlParams = new URLSearchParams(window.location.search);
+        if (urlParams.has('busNo')) {
+            document.querySelector('input[name="busNo"]').focus();
+        } else if (urlParams.has('route')) {
+            document.querySelector('input[name="route"]').focus();
+        }
+    });
+</script>
+</body>
+</html>

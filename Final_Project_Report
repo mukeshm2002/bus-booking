@@ -1,0 +1,154 @@
+# **Online Bus Ticket Booking System - Final Project Report**
+
+## **1. Introduction**
+### **1.1 Project Overview**
+The **Online Bus Ticket Booking System** is a web-based application designed to streamline the process of booking bus tickets for passengers while providing an efficient management system for administrators. The system allows users to:
+- Search for available buses
+- Select seats
+- Book tickets
+- View booking history
+
+Administrators can:
+- Add/edit/delete buses
+- Manage routes and schedules
+- View booking reports
+
+### **1.2 Technologies Used**
+| **Category**       | **Technologies**                          |
+|--------------------|------------------------------------------|
+| **Backend**        | Java, Spring Boot (3.4.3), JDK 21        |
+| **Frontend**       | Thymeleaf, HTML, CSS, JavaScript, Bootstrap 5 |
+| **Database**       | MySQL                                    |
+| **Build Tool**     | Maven                                    |
+| **IDE**           | IntelliJ IDEA Community Edition          |
+
+---
+
+## **2. System Architecture**
+### **2.1 High-Level Design**
+The system follows a **Model-View-Controller (MVC)** architecture:
+- **Model**: `Bus`, `Booking`, `User` (Entities)
+- **View**: Thymeleaf templates (`home.html`, `search-result.html`, etc.)
+- **Controller**: `AdminController`, `PassengerController`
+
+### **2.2 Database Schema**
+#### **Tables:**
+1. **`buses`**
+   - `id` (PK), `bus_no`, `from_location`, `to_location`, `departure_time`, `arrival_time`, `total_seats`, `available_seats`, `price`
+
+2. **`users`**
+   - `id` (PK), `name`, `phone_number`, `email`
+
+3. **`bookings`**
+   - `id` (PK), `booking_id`, `bus_id` (FK), `user_id` (FK), `seat_no`, `booking_time`, `status`
+
+---
+
+## **3. Features & Implementation**
+### **3.1 Admin Module**
+#### **Dashboard**
+- Displays all buses with **real-time availability**.
+- Shows **upcoming & departed** buses.
+- Allows **searching by bus number or route**.
+
+#### **Add/Edit/Delete Bus**
+- Form validation ensures correct data entry.
+- Prevents deletion of buses with existing bookings.
+
+### 3.2 Passenger Module
+#### Home Page
+- Search buses by From, To, and Date.
+- Displays **popular routes** (Chennai → Bangalore, etc.).
+
+#### **Booking Flow
+1. Search Results → Filtered bus listings.
+2. Seat Selection → Visual seat map with availability.
+3. Payment → Dummy payment confirmation.
+
+#### User Profile
+- Shows booking history.
+- Displays passenger details.
+
+---
+
+## 4. Code Structure
+### 4.1 Backend (Spring Boot)
+#### Key Classes:
+|       Class          |            Purpose                       |
+|----------------------|------------------------------------------|
+| `Bus.java`           | Entity for bus details                   |
+| `Booking.java`       | Entity for ticket bookings               |
+| `User.java`          | Entity for passenger details             |
+| `BusService.java`    | Business logic for bus operations        |
+| `AdminController`    | Handles admin dashboard & bus management |
+| `PassengerController`| Manages passenger bookings & searches    |
+
+### 4.2 Frontend (Thymeleaf)
+#### Key Pages:
+|       Page            |              Purpose                     |
+|-----------------------|------------------------------------------|
+| `dashboard.html`      | Admin bus management dashboard           |
+| `add-bus.html`        | Form to add new buses                    |
+| `edit-bus.html`       | Form to edit existing buses              |
+| `home.html`           | Passenger search page                    |
+| `seat-selection.html` | Interactive seat map for booking         |
+| `payment.html`        | Dummy payment confirmation               |
+
+---
+
+## 5. Error Handling & Validation
+### 5.1 Custom Exceptions
+- `BusNotFoundException`
+- `BookingNotFoundException`
+- `SeatNotAvailableException`
+
+### 5.2 Global Exception Handler
+```java
+@ControllerAdvice
+public class GlobalExceptionHandler {
+    @ExceptionHandler(BusNotFoundException.class)
+    public String handleBusNotFound(BusNotFoundException ex, Model model) {
+        model.addAttribute("error", ex.getMessage());
+        return "error";
+    }
+    // Other exception handlers...
+}
+```
+
+### **5.3 Form Validation**
+- Backend: Spring `@Valid` + `BindingResult`.
+- Frontend: HTML5 validation + Thymeleaf error display.
+
+
+
+## 6. Challenges & Solutions
+| Challenge                    | Solution                                    |
+|------------------------------|---------------------------------------------|
+| Seat selection UI            | Used JavaScript for interactive seat map    |
+| Date/Time handling           | Used `LocalDateTime` + Thymeleaf formatting |
+| Deleting buses with bookings | Added check in `BusService` before deletion |
+
+
+## 7. Future Enhancements
+1. User Authentication (Spring Security)
+2. Payment Gateway Integration (Razorpay/Stripe)
+3. Email/SMS Notifications
+4. Admin Analytics Dashboard
+5. Mobile App (React Native/Flutter)
+
+
+## 8. Conclusion
+This project successfully delivers a fully functional bus ticket booking system 
+✔ Admin dashboard for bus management  
+✔ User-friendly booking flow  
+✔ Responsive design (works on mobile & desktop)  
+✔ Robust error handling  
+
+The use of Spring Boot ensures scalability, while Thymeleaf provides a clean frontend integration.  
+
+
+
+Submitted by:  
+Mukesh M  
+mukeshkannan509@gmail.com  
+31/03/2025 

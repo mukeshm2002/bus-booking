@@ -1,0 +1,110 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin Dashboard | Elite Travel</title>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;700&display=swap" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.0/font/bootstrap-icons.css">
+
+    <style>
+        :root {
+            --primary-color: #ff4b2b;
+            --dark-bg: #0f172a;
+            --card-bg: rgba(30, 41, 59, 0.7);
+        }
+
+        body { font-family: 'Outfit', sans-serif; background-color: var(--dark-bg); color: #fff; }
+
+        .navbar { background: rgba(15, 23, 42, 0.9); backdrop-filter: blur(10px); }
+
+        .dashboard-container { margin-top: 100px; }
+
+        .search-box {
+            background: var(--card-bg);
+            padding: 25px;
+            border-radius: 20px;
+            border: 1px solid rgba(255,255,255,0.1);
+            margin-bottom: 30px;
+        }
+
+        .table { color: white; background: var(--card-bg); border-radius: 20px; overflow: hidden; }
+        .table thead { background: rgba(255,255,255,0.05); }
+        .table td, .table th { padding: 15px; border-color: rgba(255,255,255,0.05); }
+
+        .btn-primary { background: var(--primary-color); border: none; }
+        .btn-primary:hover { background: #ff3e1d; }
+
+        .progress { background: #1e293b; height: 6px; }
+
+        .status-badge { padding: 5px 10px; border-radius: 8px; font-size: 0.8rem; }
+    </style>
+</head>
+<body>
+
+<nav class="navbar navbar-expand-lg navbar-dark fixed-top">
+    <div class="container">
+        <a class="navbar-brand fw-bold" href="/admin/dashboard">Elite<span style="color:var(--primary-color)">Admin</span></a>
+        <div class="d-flex align-items-center">
+            <span class="current-time me-3" th:text="${#temporals.format(currentDateTime, 'dd MMM, HH:mm')}"></span>
+            <a href="/logout" class="btn btn-outline-light btn-sm"><i class="bi bi-box-arrow-right"></i></a>
+        </div>
+    </div>
+</nav>
+
+<div class="container dashboard-container">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h2>Bus Management</h2>
+        <a href="/admin/add-bus" class="btn btn-primary px-4"><i class="bi bi-plus-circle me-2"></i>Add Bus</a>
+    </div>
+
+    <div class="search-box">
+        <form th:action="@{/admin/dashboard}" method="get" class="row g-3">
+            <div class="col-md-5"><input type="text" class="form-control" name="busNo" placeholder="Bus Number" th:value="${param.busNo}"></div>
+            <div class="col-md-5"><input type="text" class="form-control" name="route" placeholder="Route (From/To)" th:value="${param.route}"></div>
+            <div class="col-md-2 d-grid"><button type="submit" class="btn btn-primary">Search</button></div>
+        </form>
+    </div>
+
+    <div class="table-responsive">
+        <table class="table align-middle">
+            <thead>
+            <tr>
+                <th>Bus</th>
+                <th>Route</th>
+                <th>Schedule</th>
+                <th>Capacity</th>
+                <th>Status</th>
+                <th>Actions</th>
+            </tr>
+            </thead>
+            <tbody>
+            <tr th:each="bus : ${buses}">
+                <td class="fw-bold" th:text="${bus.busNo}"></td>
+                <td><span th:text="${bus.fromLocation}"></span> ➔ <span th:text="${bus.toLocation}"></span></td>
+                <td>
+                    <small class="d-block"><i class="bi bi-clock"></i> <span th:text="${#temporals.format(bus.departureTime, 'HH:mm')}"></span></small>
+                </td>
+                <td style="width: 150px;">
+                    <div class="progress"><div class="progress-bar" th:style="'width:' + ${(bus.totalSeats - bus.availableSeats) * 100 / bus.totalSeats} + '%'"></div></div>
+                    <small th:text="${bus.availableSeats} + ' seats left'"></small>
+                </td>
+                <td>
+                        <span th:classappend="${bus.departureTime.isAfter(currentDateTime)} ? 'bg-success' : 'bg-secondary'" class="badge status-badge">
+                            <span th:text="${bus.departureTime.isAfter(currentDateTime)} ? 'Upcoming' : 'Departed'"></span>
+                        </span>
+                </td>
+                <td>
+                    <a th:href="@{/admin/edit-bus/{id}(id=${bus.id})}" class="btn btn-sm btn-outline-warning"><i class="bi bi-pencil"></i></a>
+                    <a th:href="@{/admin/delete-bus/{id}(id=${bus.id})}" class="btn btn-sm btn-outline-danger" onclick="return confirm('Sure?')"><i class="bi bi-trash"></i></a>
+                </td>
+            </tr>
+            </tbody>
+        </table>
+    </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>

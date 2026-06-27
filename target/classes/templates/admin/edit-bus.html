@@ -1,0 +1,135 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Edit Bus</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.0/font/bootstrap-icons.css">
+    <style>
+        .form-container {
+            max-width: 800px;
+            margin: 30px auto;
+            padding: 30px;
+            border-radius: 10px;
+            box-shadow: 0 0 20px rgba(0,0,0,0.1);
+            background-color: #fff;
+        }
+        .form-header {
+            text-align: center;
+            margin-bottom: 30px;
+            color: #343a40;
+            border-bottom: 2px solid #343a40;
+            padding-bottom: 10px;
+        }
+        .error-message {
+            color: #dc3545;
+            font-size: 0.875rem;
+        }
+    </style>
+</head>
+<body>
+<nav class="navbar navbar-expand-lg navbar-dark bg-dark">
+    <div class="container">
+        <a class="navbar-brand" href="/admin/dashboard">
+            <i class="bi bi-bus-front"></i> BusTicketBooking Admin
+        </a>
+    </div>
+</nav>
+
+<div class="container">
+    <div class="form-container">
+        <h2 class="form-header"><i class="bi bi-pencil-square me-2"></i>Edit Bus</h2>
+
+        <!-- Error Messages -->
+        <div th:if="${errorMessage}" class="alert alert-danger">
+            <span th:text="${errorMessage}"></span>
+        </div>
+
+        <form th:action="@{/admin/update-bus}" th:object="${bus}" method="post">
+            <input type="hidden" th:field="*{id}"/>
+
+            <div class="row mb-3">
+                <div class="col-md-6">
+                    <label for="busNo" class="form-label">Bus Number</label>
+                    <input type="text" class="form-control" id="busNo" th:field="*{busNo}" required>
+                    <div class="error-message" th:if="${#fields.hasErrors('busNo')}" th:errors="*{busNo}"></div>
+                </div>
+                <div class="col-md-6">
+                    <label for="price" class="form-label">Price (₹)</label>
+                    <input type="number" class="form-control" id="price" th:field="*{price}" min="0" step="0.01" required>
+                    <div class="error-message" th:if="${#fields.hasErrors('price')}" th:errors="*{price}"></div>
+                </div>
+            </div>
+
+            <div class="row mb-3">
+                <div class="col-md-6">
+                    <label for="fromLocation" class="form-label">From</label>
+                    <input type="text" class="form-control" id="fromLocation" th:field="*{fromLocation}" required>
+                    <div class="error-message" th:if="${#fields.hasErrors('fromLocation')}" th:errors="*{fromLocation}"></div>
+                </div>
+                <div class="col-md-6">
+                    <label for="toLocation" class="form-label">To</label>
+                    <input type="text" class="form-control" id="toLocation" th:field="*{toLocation}" required>
+                    <div class="error-message" th:if="${#fields.hasErrors('toLocation')}" th:errors="*{toLocation}"></div>
+                </div>
+            </div>
+
+            <div class="row mb-3">
+                <div class="col-md-6">
+                    <label for="departureTime" class="form-label">Departure Time</label>
+                    <input type="datetime-local" class="form-control" id="departureTime"
+                           th:value="${#temporals.format(bus.departureTime, 'yyyy-MM-ddTHH:mm')}" required>
+                    <div class="error-message" th:if="${#fields.hasErrors('departureTime')}" th:errors="*{departureTime}"></div>
+                </div>
+                <div class="col-md-6">
+                    <label for="arrivalTime" class="form-label">Arrival Time</label>
+                    <input type="datetime-local" class="form-control" id="arrivalTime"
+                           th:value="${#temporals.format(bus.arrivalTime, 'yyyy-MM-ddTHH:mm')}" required>
+                    <div class="error-message" th:if="${#fields.hasErrors('arrivalTime')}" th:errors="*{arrivalTime}"></div>
+                </div>
+            </div>
+
+            <div class="row mb-3">
+                <div class="col-md-6">
+                    <label for="totalSeats" class="form-label">Total Seats</label>
+                    <input type="number" class="form-control" id="totalSeats" th:field="*{totalSeats}" min="1" required>
+                    <div class="error-message" th:if="${#fields.hasErrors('totalSeats')}" th:errors="*{totalSeats}"></div>
+                </div>
+                <div class="col-md-6">
+                    <label for="availableSeats" class="form-label">Available Seats</label>
+                    <input type="number" class="form-control" id="availableSeats" th:field="*{availableSeats}" min="0" required>
+                    <div class="error-message" th:if="${#fields.hasErrors('availableSeats')}" th:errors="*{availableSeats}"></div>
+                </div>
+            </div>
+
+            <div class="d-flex justify-content-between mt-4">
+                <a href="/admin/dashboard" class="btn btn-secondary">
+                    <i class="bi bi-x-circle"></i> Cancel
+                </a>
+                <button type="submit" class="btn btn-primary">
+                    <i class="bi bi-save"></i> Update Bus
+                </button>
+            </div>
+        </form>
+    </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+<script>
+    // Link total seats and available seats
+    document.getElementById('totalSeats').addEventListener('change', function() {
+        const availableSeats = document.getElementById('availableSeats');
+        if (parseInt(availableSeats.value) > parseInt(this.value)) {
+            availableSeats.value = this.value;
+        }
+        availableSeats.max = this.value;
+    });
+
+    // Set minimum arrival time based on departure time
+    document.getElementById('departureTime').addEventListener('change', function() {
+        document.getElementById('arrivalTime').min = this.value;
+    });
+</script>
+</body>
+</html>
