@@ -23,7 +23,7 @@ public class User {
     private List<Booking> bookings;
 
     // User.java-வில் சேர்க்க வேண்டியவை:
-    @Column(nullable = false)
+    @Column(name = "password")
     private String password;
 
     @Column(nullable = false)
