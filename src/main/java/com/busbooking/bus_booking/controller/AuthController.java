@@ -57,12 +57,4 @@ public class AuthController {
         }
         return "redirect:/passenger/verify-otp?error=true";
     }
-
-
-    // அட்மின் டாஷ்போர்டுக்குச் செல்ல (Security மூலம் இது ப்ரொடக்ட் செய்யப்படும்)
-    @GetMapping("/admin/dashboard")
-    public String adminDashboard(Model model) {
-        // அட்மின் டாஷ்போர்டுக்குத் தேவையான டேட்டாவை இங்கேயே எடுத்துக்கொள்ளலாம்
-        return "admin/dashboard";
-    }
 }
