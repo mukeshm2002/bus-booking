@@ -1,8 +1,6 @@
 package com.busbooking.bus_booking.service;
 
-
 import com.busbooking.bus_booking.exception.BusNotFoundException;
-import com.busbooking.bus_booking.exception.InvalidInputException;
 import com.busbooking.bus_booking.exception.SeatNotAvailableException;
 import com.busbooking.bus_booking.model.Booking;
 import com.busbooking.bus_booking.model.Bus;
@@ -15,13 +13,20 @@ import java.util.List;
 
 @Service
 public class BusService {
+
     @Autowired
     private BusRepository busRepository;
-    private BookingRepository bookingRepository;
 
+    @Autowired // இதை மறக்காமல் சேர்த்துள்ளேன்
+    private BookingRepository bookingRepository;
 
     public List<Bus> getAllBuses() {
         return busRepository.findAll();
+    }
+
+    // Active பஸ்களை மட்டும் எடுக்க (புதிய அம்சம்)
+    public List<Bus> getActiveBuses() {
+        return busRepository.findByIsActiveTrue();
     }
 
     public List<Bus> searchByBusNo(String busNo) {
@@ -46,7 +51,7 @@ public class BusService {
         Bus bus = busRepository.findById(id)
                 .orElseThrow(() -> new BusNotFoundException("Bus not found with id: " + id));
 
-        // Check if bus has any bookings
+        // பஸ்ஸுக்கு புக்கிங் இருந்தால் டெலீட் செய்யக்கூடாது
         List<Booking> bookings = bookingRepository.findByBus(bus);
         if (!bookings.isEmpty()) {
             throw new IllegalStateException("Cannot delete bus with existing bookings. Delete bookings first.");
@@ -56,7 +61,7 @@ public class BusService {
     }
 
     public Bus saveBus(Bus bus) {
-        // Validate required fields
+        // Validation logic
         if (bus.getBusNo() == null || bus.getBusNo().trim().isEmpty()) {
             throw new IllegalArgumentException("Bus number is required");
         }
@@ -66,20 +71,14 @@ public class BusService {
         if (bus.getToLocation() == null || bus.getToLocation().trim().isEmpty()) {
             throw new IllegalArgumentException("To location is required");
         }
-        if (bus.getDepartureTime() == null) {
-            throw new IllegalArgumentException("Departure time is required");
-        }
-        if (bus.getArrivalTime() == null) {
-            throw new IllegalArgumentException("Arrival time is required");
+        if (bus.getDepartureTime() == null || bus.getArrivalTime() == null) {
+            throw new IllegalArgumentException("Departure and Arrival times are required");
         }
         if (bus.getDepartureTime().isAfter(bus.getArrivalTime())) {
             throw new IllegalArgumentException("Departure must be before arrival");
         }
         if (bus.getTotalSeats() <= 0) {
             throw new IllegalArgumentException("Total seats must be positive");
-        }
-        if (bus.getAvailableSeats() < 0 || bus.getAvailableSeats() > bus.getTotalSeats()) {
-            throw new IllegalArgumentException("Available seats must be between 0 and total seats");
         }
         if (bus.getPrice() <= 0) {
             throw new IllegalArgumentException("Price must be positive");

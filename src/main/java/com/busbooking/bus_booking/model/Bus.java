@@ -34,7 +34,11 @@ public class Bus {
     private int availableSeats;
 
     @Column(nullable = false)
-    private double price;
+    private double price;@Column(name = "bus_type")
+    private String busType; // e.g., "AC Sleeper", "Non-AC Seater"
+
+    @Column(name = "is_active")
+    private boolean isActive = true;
 
     @OneToMany(mappedBy = "bus", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<Booking> bookings = new ArrayList<>();
@@ -43,7 +47,7 @@ public class Bus {
     public Bus() {}
 
     public Bus(String busNo, String fromLocation, String toLocation, LocalDateTime departureTime,
-               LocalDateTime arrivalTime, int totalSeats, int availableSeats, double price) {
+               LocalDateTime arrivalTime, int totalSeats, int availableSeats, double price, String busType) {
         this.busNo = busNo;
         this.fromLocation = fromLocation;
         this.toLocation = toLocation;
@@ -52,6 +56,8 @@ public class Bus {
         this.totalSeats = totalSeats;
         this.availableSeats = availableSeats;
         this.price = price;
+        this.busType = busType;
+        this.isActive = true;
     }
 
     // Getters and Setters
@@ -125,5 +131,32 @@ public class Bus {
 
     public void setPrice(double price) {
         this.price = price;
+    }
+
+    // BusType Getter and Setter
+    public String getBusType() {
+        return busType;
+    }
+
+    public void setBusType(String busType) {
+        this.busType = busType;
+    }
+
+    // IsActive Getter and Setter
+    public boolean isActive() {
+        return isActive;
+    }
+
+    public void setActive(boolean isActive) {
+        this.isActive = isActive;
+    }
+
+    // Bookings Getter and Setter (ஏற்கனவே இல்லையென்றால் சேர்த்துக்கொள்ளுங்கள்)
+    public List<Booking> getBookings() {
+        return bookings;
+    }
+
+    public void setBookings(List<Booking> bookings) {
+        this.bookings = bookings;
     }
 }

@@ -11,6 +11,12 @@ public class BusDTO {
     private int totalSeats;
     private int availableSeats;
     private double price;
+    private String busType;
+    private boolean isActive;
+    private double totalPrice;
+
+    public double getTotalPrice() { return totalPrice; }
+    public void setTotalPrice(double totalPrice) { this.totalPrice = totalPrice; }
 
     // Getters and Setters
     public String getBusNo() {
@@ -76,4 +82,9 @@ public class BusDTO {
     public void setPrice(double price) {
         this.price = price;
     }
+
+    public String getBusType() { return busType; }
+    public void setBusType(String busType) { this.busType = busType; }
+    public boolean isActive() { return isActive; }
+    public void setActive(boolean isActive) { this.isActive = isActive; }
 }

@@ -1,20 +1,20 @@
 package com.busbooking.bus_booking.dto;
 
-public class UserDTO {
+public class RegisterDTO {
     private String name;
     private String phoneNumber;
     private String email;
-    private String role;
+    private String password;
 
     // Default Constructor
-    public UserDTO() {}
+    public RegisterDTO() {}
 
     // Parameterized Constructor
-    public UserDTO(String name, String phoneNumber, String email, String role) {
+    public RegisterDTO(String name, String phoneNumber, String email, String password) {
         this.name = name;
         this.phoneNumber = phoneNumber;
         this.email = email;
-        this.role = role;
+        this.password = password;
     }
 
     // Getters and Setters
@@ -27,6 +27,6 @@ public class UserDTO {
     public String getEmail() { return email; }
     public void setEmail(String email) { this.email = email; }
 
-    public String getRole() { return role; }
-    public void setRole(String role) { this.role = role; }
+    public String getPassword() { return password; }
+    public void setPassword(String password) { this.password = password; }
 }

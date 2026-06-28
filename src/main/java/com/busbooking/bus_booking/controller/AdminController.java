@@ -1,10 +1,8 @@
 package com.busbooking.bus_booking.controller;
 
-
 import com.busbooking.bus_booking.exception.BusNotFoundException;
-import com.busbooking.bus_booking.exception.InvalidInputException;
-import com.busbooking.bus_booking.model.Booking;
 import com.busbooking.bus_booking.model.Bus;
+import com.busbooking.bus_booking.repository.BookingRepository;
 import com.busbooking.bus_booking.service.BusService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
@@ -19,12 +17,13 @@ import java.util.List;
 @Controller
 @RequestMapping("/admin")
 public class AdminController {
+
     @Autowired
     private BusService busService;
 
+    // பிழை சரிசெய்யப்பட்டது: BookingService-க்கு பதிலாக BookingRepository பயன்படுத்தப்பட்டுள்ளது
     @Autowired
-    private BusService bookingService;
-
+    private BookingRepository bookingRepository;
 
     @GetMapping("/dashboard")
     public String dashboard(
@@ -35,13 +34,10 @@ public class AdminController {
         List<Bus> buses;
 
         if (busNo != null && !busNo.isEmpty()) {
-            // Search by bus number
             buses = busService.searchByBusNo(busNo);
         } else if (route != null && !route.isEmpty()) {
-            // Search by route (from or to location)
             buses = busService.searchByRoute(route);
         } else {
-            // Show all upcoming buses by default
             buses = busService.getUpcomingBuses();
         }
 
@@ -53,21 +49,22 @@ public class AdminController {
         return "admin/dashboard";
     }
 
-
     @GetMapping("/add-bus")
     public String showAddBusForm(Model model) {
         model.addAttribute("bus", new Bus());
         return "admin/add-bus";
     }
+
     @PostMapping("/add-bus")
     public String addBus(@ModelAttribute Bus bus,
                          BindingResult result,
                          RedirectAttributes redirectAttributes) {
 
-        // Manual validation
         if (bus.getBusNo() == null || bus.getBusNo().trim().isEmpty()) {
             result.rejectValue("busNo", "error.bus", "Bus number is required");
         }
+
+        // Validation check
         if (bus.getDepartureTime() != null && bus.getArrivalTime() != null &&
                 bus.getDepartureTime().isAfter(bus.getArrivalTime())) {
             result.rejectValue("departureTime", "error.bus", "Departure must be before arrival");
@@ -82,8 +79,7 @@ public class AdminController {
             redirectAttributes.addFlashAttribute("successMessage", "Bus added successfully!");
             return "redirect:/admin/dashboard";
         } catch (Exception e) {
-            redirectAttributes.addFlashAttribute("errorMessage",
-                    "Error adding bus: " + e.getMessage());
+            redirectAttributes.addFlashAttribute("errorMessage", "Error adding bus: " + e.getMessage());
             return "admin/add-bus";
         }
     }
@@ -104,20 +100,16 @@ public class AdminController {
                             BindingResult result,
                             RedirectAttributes redirectAttributes) {
         try {
-            // Validate input
             if (bus.getDepartureTime().isAfter(bus.getArrivalTime())) {
-                result.rejectValue("departureTime", "error.bus",
-                        "Departure must be before arrival");
+                result.rejectValue("departureTime", "error.bus", "Departure must be before arrival");
                 return "admin/edit-bus";
             }
 
             busService.saveBus(bus);
-            redirectAttributes.addFlashAttribute("successMessage",
-                    "Bus updated successfully!");
+            redirectAttributes.addFlashAttribute("successMessage", "Bus updated successfully!");
             return "redirect:/admin/dashboard";
         } catch (Exception e) {
-            redirectAttributes.addFlashAttribute("errorMessage",
-                    "Error updating bus: " + e.getMessage());
+            redirectAttributes.addFlashAttribute("errorMessage", "Error updating bus: " + e.getMessage());
             return "redirect:/admin/edit-bus/" + bus.getId();
         }
     }

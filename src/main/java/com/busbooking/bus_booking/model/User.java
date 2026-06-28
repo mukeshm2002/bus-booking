@@ -22,13 +22,31 @@ public class User {
     @OneToMany(mappedBy = "user", cascade = CascadeType.ALL)
     private List<Booking> bookings;
 
+    // User.java-வில் சேர்க்க வேண்டியவை:
+    @Column(nullable = false)
+    private String password;
+
+    @Column(nullable = false)
+    private String role; // "ROLE_USER" or "ROLE_ADMIN"
+
+    @Column(name = "otp")
+    private String otp;
+
+    @Column(name = "is_verified")
+    private boolean isVerified = false;
+
+// இதற்கான Getters மற்றும் Setters-ஐச் சேர்த்துக் கொள்ளவும்.
+
     // Constructors
     public User() {}
 
-    public User(String name, String phoneNumber, String email) {
+    public User(String name, String phoneNumber, String email, String password, String role) {
         this.name = name;
         this.phoneNumber = phoneNumber;
         this.email = email;
+        this.password = password;
+        this.role = role;
+        this.isVerified = false; // ஆரம்பத்தில் வெரிஃபிகேஷன் இருக்காது
     }
 
     // Getters and Setters
@@ -71,4 +89,20 @@ public class User {
     public void setBookings(List<Booking> bookings) {
         this.bookings = bookings;
     }
+
+    // Password
+    public String getPassword() { return password; }
+    public void setPassword(String password) { this.password = password; }
+
+    // Role
+    public String getRole() { return role; }
+    public void setRole(String role) { this.role = role; }
+
+    // OTP
+    public String getOtp() { return otp; }
+    public void setOtp(String otp) { this.otp = otp; }
+
+    // IsVerified
+    public boolean isVerified() { return isVerified; }
+    public void setVerified(boolean isVerified) { this.isVerified = isVerified; }
 }

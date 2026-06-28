@@ -30,16 +30,25 @@ public class Booking {
     @Column(nullable = false)
     private String status; // "CONFIRMED", "CANCELLED"
 
+    // Booking.java-வில் சேர்க்க வேண்டியவை:
+    @Column(name = "total_price")
+    private double totalPrice;
+
+    @Column(name = "ticket_pdf_path")
+    private String ticketPdfPath; // PDF சேமிக்கப்படும் இடம்
+
     // Constructors
     public Booking() {}
 
-    public Booking(String bookingId, Bus bus, User user, String seatNo, LocalDateTime bookingTime, String status) {
+    public Booking(String bookingId, Bus bus, User user, String seatNo,
+                   LocalDateTime bookingTime, String status, double totalPrice) {
         this.bookingId = bookingId;
         this.bus = bus;
         this.user = user;
         this.seatNo = seatNo;
         this.bookingTime = bookingTime;
         this.status = status;
+        this.totalPrice = totalPrice;
     }
 
     // Getters and Setters
@@ -97,5 +106,21 @@ public class Booking {
 
     public void setStatus(String status) {
         this.status = status;
+    }
+
+    public double getTotalPrice() {
+        return totalPrice;
+    }
+
+    public void setTotalPrice(double totalPrice) {
+        this.totalPrice = totalPrice;
+    }
+
+    public String getTicketPdfPath() {
+        return ticketPdfPath;
+    }
+
+    public void setTicketPdfPath(String ticketPdfPath) {
+        this.ticketPdfPath = ticketPdfPath;
     }
 }

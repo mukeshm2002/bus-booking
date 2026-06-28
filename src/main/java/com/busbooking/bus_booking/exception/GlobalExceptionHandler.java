@@ -56,4 +56,24 @@ public class GlobalExceptionHandler {
         model.addAttribute("errorMessage", "An unexpected error occurred. Please try again later.");
         return "error";
     }
+
+    // ... மற்றவை அப்படியே இருக்கட்டும் ...
+
+    // OTP அல்லது Registration எர்ரர்களைக் கையாள
+    @ExceptionHandler(RuntimeException.class) // பொதுவான ரன்டைம் எர்ரர்களுக்கு
+    @ResponseStatus(HttpStatus.BAD_REQUEST)
+    public String handleRuntimeException(RuntimeException ex, Model model) {
+        model.addAttribute("errorTitle", "Process Error");
+        model.addAttribute("errorMessage", ex.getMessage());
+        return "error";
+    }
+
+    // செக்யூரிட்டி எர்ரர்களைக் கையாள (Access Denied)
+    @ExceptionHandler(org.springframework.security.access.AccessDeniedException.class)
+    @ResponseStatus(HttpStatus.FORBIDDEN)
+    public String handleAccessDeniedException(Exception ex, Model model) {
+        model.addAttribute("errorTitle", "Access Denied");
+        model.addAttribute("errorMessage", "You do not have permission to access this page.");
+        return "error";
+    }
 }

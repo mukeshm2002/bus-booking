@@ -21,4 +21,7 @@ public interface BusRepository extends JpaRepository<Bus, Integer> {
     List<Bus> findByFromLocationContainingIgnoreCaseOrToLocationContainingIgnoreCase(String fromLocation, String toLocation);
 
     List<Bus> findByDepartureTimeAfterOrderByDepartureTime(LocalDateTime departureTime);
+
+    // உங்கள் BusRepository-ல் இதையும் சேர்த்துக்கொள்ளுங்கள் (Active buses மட்டும் எடுக்க)
+    List<Bus> findByIsActiveTrue();
 }
